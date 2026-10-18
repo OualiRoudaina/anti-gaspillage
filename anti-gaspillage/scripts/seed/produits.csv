@@ -1,0 +1,31 @@
+Référence interne,Nom,Catégorie,Prix de vente
+LAI001,Yaourt nature x4,Produits laitiers,2.5
+LAI002,Lait demi-écrémé 1L,Produits laitiers,1.8
+LAI003,Fromage frais 200g,Produits laitiers,3.2
+LAI004,Beurre 250g,Produits laitiers,5.5
+LAI005,Crème fraîche 20cl,Produits laitiers,2.9
+LAI006,Fromage râpé 200g,Produits laitiers,4.2
+LAI007,Crème caramel x4,Produits laitiers,3.6
+BOU001,Baguette,Boulangerie,0.25
+BOU002,Pain de mie,Boulangerie,2.2
+BOU003,Croissants x6,Boulangerie,4.8
+BOU004,Brioche,Boulangerie,3.4
+BOU005,Pain complet,Boulangerie,1.5
+VIA001,Poulet entier,Viandes et poissons,14.0
+VIA002,Steak haché 500g,Viandes et poissons,16.5
+VIA003,Escalope de dinde,Viandes et poissons,12.0
+VIA004,Saucisses 400g,Viandes et poissons,9.5
+VIA005,Filet de poisson blanc,Viandes et poissons,18.0
+VIA006,Jambon de dinde 4 tranches,Viandes et poissons,4.9
+FRU001,Salade verte,Fruits et légumes,1.2
+FRU002,Tomates 1kg,Fruits et légumes,2.4
+FRU003,Fraises 500g,Fruits et légumes,6.5
+FRU004,Bananes 1kg,Fruits et légumes,3.1
+FRU005,Carottes 1kg,Fruits et légumes,1.9
+FRU006,Courgettes 1kg,Fruits et légumes,2.6
+FRA001,Houmous 200g,Plats frais,3.9
+FRA002,Salade composée,Plats frais,5.2
+FRA003,Pizza fraîche,Plats frais,8.5
+FRA004,Jus d'orange frais 1L,Plats frais,5.8
+FRA005,Oeufs x12,Plats frais,6.0
+FRA006,Pâtes fraîches 250g,Plats frais,4.4
