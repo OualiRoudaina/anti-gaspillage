@@ -16,7 +16,7 @@ import shutil
 import sys
 
 import redis
-
+from risque import recalculer_risque
 KAFKA = os.environ.get("KAFKA_BOOTSTRAP", "kafka:9092")
 REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or None
@@ -45,6 +45,7 @@ def appliquer_ventes(r, valeurs):
     script = r.register_script(LUA_VENTE)
     pipe = r.pipeline(transaction=False)
     envoyees = illisibles = 0
+    lots_traites = []
     for brut in valeurs:
         try:
             v = json.loads(brut)
@@ -54,8 +55,11 @@ def appliquer_ventes(r, valeurs):
             illisibles += 1
             continue
         script(keys=cles, args=args, client=pipe)
+        lots_traites.append(v["lot_id"])
         envoyees += 1
     resultats = pipe.execute() if envoyees else []
+    # Seuls les lots dont le stock a vraiment changé (résultat 1) sont recalculés
+    recalculer_risque(r, [lot for lot, res in zip(lots_traites, resultats) if res == 1])
     stats = {"appliquees": resultats.count(1), "doublons": resultats.count(0),
              "lot_inconnu": resultats.count(-1), "illisibles": illisibles}
     for nom, n in stats.items():
@@ -63,8 +67,9 @@ def appliquer_ventes(r, valeurs):
             r.hincrby("stats:ventes", nom, n)
     return stats
 
-
 def initialiser_lots(spark, r):
+    n = recalculer_risque(r, [k[4:] for k in r.scan_iter(match="lot:*")])
+    print(f"Risque calculé pour {n} lots", flush=True)
     brut = (spark.read.format("kafka")
             .option("kafka.bootstrap.servers", KAFKA).option("subscribe", "lots")
             .option("startingOffsets", "earliest").option("endingOffsets", "latest")
