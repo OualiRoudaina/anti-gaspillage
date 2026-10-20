@@ -132,6 +132,12 @@ class Odoo:
             try:
                 return self.models.execute_kw(self.db, self.uid, self.password,
                                               model, method, list(args), kwargs)
+            except xmlrpc.client.Fault as e:
+                # Certaines méthodes Odoo ne renvoient rien (None) : le serveur ne sait pas
+                # le transmettre par XML-RPC, mais le traitement a bien été fait.
+                if "cannot marshal None" in str(e):
+                    return None
+                raise
             except (ConnectionError, xmlrpc.client.ProtocolError, OSError):
                 if essai == 5:
                     raise
@@ -211,26 +217,36 @@ def seed(o, produits, lots):
     print(f"  {len(variantes)} produits prêts")
 
     print("Lots et stock :")
-    quants, crees = [], 0
+    a_valider, crees = [], 0
     for l in lots:
         pid = variantes[l["ref"]]
-        if o.call("stock.lot", "search", [("name", "=", l["lot"]), ("product_id", "=", pid)], limit=1):
-            continue
-        lot_id = o.call("stock.lot", "create", {
-            "name": l["lot"], "product_id": pid, "company_id": company_id,
-            "expiration_date": l["peremption"] + " 12:00:00",
-        })
-        quants.append(o.call("stock.quant", "create", {
-            "product_id": pid, "location_id": emplacements[l["magasin"]],
-            "lot_id": lot_id, "inventory_quantity": l["stock"],
-        }, context={"inventory_mode": True}))
-        crees += 1
-        if len(quants) >= 50:  # on valide le stock par paquets de 50
-            o.call("stock.quant", "action_apply_inventory", quants, context={"inventory_mode": True})
-            quants = []
-            print(f"  {crees} lots...")
-    if quants:
-        o.call("stock.quant", "action_apply_inventory", quants, context={"inventory_mode": True})
+        emplacement = emplacements[l["magasin"]]
+        lot_ids = o.call("stock.lot", "search", [("name", "=", l["lot"]), ("product_id", "=", pid)], limit=1)
+        if lot_ids:
+            lot_id = lot_ids[0]
+        else:
+            lot_id = o.call("stock.lot", "create", {
+                "name": l["lot"], "product_id": pid, "company_id": company_id,
+                "expiration_date": l["peremption"] + " 12:00:00",
+            })
+            crees += 1
+        # Le stock n'est créé que s'il n'existe pas encore (permet de reprendre après une erreur)
+        if not o.call("stock.quant", "search", [("lot_id", "=", lot_id), ("location_id", "=", emplacement)], limit=1):
+            a_valider.append(o.call("stock.quant", "create", {
+                "product_id": pid, "location_id": emplacement,
+                "lot_id": lot_id, "inventory_quantity": l["stock"],
+            }, context={"inventory_mode": True}))
+        if len(a_valider) >= 50:  # on valide le stock par paquets de 50
+            o.call("stock.quant", "action_apply_inventory", a_valider, context={"inventory_mode": True})
+            a_valider = []
+            print(f"  {crees} lots créés...")
+    if a_valider:
+        o.call("stock.quant", "action_apply_inventory", a_valider, context={"inventory_mode": True})
+    # Filet de sécurité : valider les stocks saisis mais restés en attente (reprise après erreur)
+    en_attente = o.call("stock.quant", "search", [("lot_id", "!=", False), ("inventory_quantity_set", "=", True)])
+    if en_attente:
+        o.call("stock.quant", "action_apply_inventory", en_attente, context={"inventory_mode": True})
+        print(f"  {len(en_attente)} stocks en attente validés")
     print(f"  {crees} nouveaux lots créés ({len(lots) - crees} existaient déjà)")
 
 
