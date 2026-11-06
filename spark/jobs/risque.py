@@ -5,7 +5,8 @@ Calcul du risque d'invendus par lot.
 
 Sources :
 - Redis : stock_restant, date_limite, produit, magasin
-- VITESSE_DEFAUT : vitesse provisoire de vente en unités/jour
+- Redis : vitesse_moyenne_jour calculée par vitesses_vente.py
+- VITESSE_DEFAUT : vitesse de secours si aucune vitesse n'est disponible
 
 Résultats :
 - risque:{lot_id} : résultats du calcul
@@ -66,6 +67,25 @@ def jours_restants(date_limite, maintenant):
         return None
 
 
+def obtenir_vitesse_vente(client, lot_id):
+    """
+    Récupère la vitesse moyenne de vente calculée par le batch.
+    Utilise la vitesse par défaut si aucune valeur valide n'existe.
+    """
+    donnees = client.hgetall(f"vitesse:{lot_id}")
+
+    try:
+        vitesse = float(donnees.get("vitesse_moyenne_jour", 0))
+
+        if vitesse > 0:
+            return vitesse
+
+    except (TypeError, ValueError):
+        pass
+
+    return VITESSE_DEFAUT
+
+
 def calculer_risque(stock, jours, vitesse):
     """
     Calcule les invendus projetés, le taux de risque,
@@ -102,8 +122,8 @@ def calculer_risque(stock, jours, vitesse):
     }
 
 
-def analyser_lot(lot, maintenant):
-    """Analyse un lot et retourne ses indicateurs de risque."""
+def analyser_lot(lot, maintenant, vitesse):
+    """Analyse un lot avec sa vitesse réelle de vente."""
 
     stock = float(lot.get("stock_restant", 0))
 
@@ -118,13 +138,13 @@ def analyser_lot(lot, maintenant):
     resultat = calculer_risque(
         stock=stock,
         jours=jours,
-        vitesse=VITESSE_DEFAUT
+        vitesse=vitesse
     )
 
     resultat.update({
         "stock_restant": stock,
         "jours_restants": round(jours, 2),
-        "vitesse_vente": VITESSE_DEFAUT,
+        "vitesse_vente": round(vitesse, 2),
         "produit": lot.get("produit", ""),
         "magasin": lot.get("magasin", ""),
         "date_limite": lot.get("date_limite", ""),
@@ -144,7 +164,14 @@ def traiter_lot(client, lot_id, maintenant, dry_run=False):
         print(f"[IGNORÉ] Lot introuvable : {lot_id}")
         return
 
-    resultat = analyser_lot(lot, maintenant)
+    # Récupération de la vitesse calculée dans Redis
+    vitesse = obtenir_vitesse_vente(client, lot_id)
+
+    resultat = analyser_lot(
+        lot,
+        maintenant,
+        vitesse
+    )
 
     if resultat is None:
         print(f"[IGNORÉ] Date limite invalide : {lot_id}")
@@ -154,6 +181,7 @@ def traiter_lot(client, lot_id, maintenant, dry_run=False):
         f"[{resultat['niveau_risque'].upper()}] "
         f"{lot_id} | "
         f"Stock : {resultat['stock_restant']} | "
+        f"Vitesse/jour : {resultat['vitesse_vente']} | "
         f"Invendus : {resultat['invendus_projetes']} | "
         f"Taux : {resultat['taux_invendus']}% | "
         f"Remise : {resultat['remise_recommandee']}%"
@@ -171,8 +199,7 @@ def traiter_lot(client, lot_id, maintenant, dry_run=False):
         }
     )
 
-    # Les lots à surveiller ou à risque élevé
-    # sont ajoutés à l'ensemble des alertes.
+    # Mise à jour de l'ensemble des alertes
     if resultat["niveau_risque"] in ("a_surveiller", "eleve"):
         client.sadd(CLE_ALERTES, lot_id)
     else:
@@ -201,7 +228,8 @@ def main():
     maintenant = datetime.now(timezone.utc)
 
     print("=== ANALYSE DES RISQUES D'INVENDUS ===")
-    print(f"Vitesse de vente utilisée : {VITESSE_DEFAUT} unités/jour")
+    print("Source : vitesses de vente calculées dans Redis")
+    print(f"Vitesse de secours : {VITESSE_DEFAUT} unités/jour")
     print(f"Mode simulation : {args.dry_run}")
     print("--------------------------------------")
 
@@ -212,6 +240,8 @@ def main():
             maintenant,
             args.dry_run
         )
+        nombre = 1
+
     else:
         nombre = 0
 
@@ -227,9 +257,8 @@ def main():
 
             nombre += 1
 
-        print("--------------------------------------")
-        print(f"Nombre de lots analysés : {nombre}")
-
+    print("--------------------------------------")
+    print(f"Nombre de lots analysés : {nombre}")
     print("=== ANALYSE TERMINÉE ===")
 
 
