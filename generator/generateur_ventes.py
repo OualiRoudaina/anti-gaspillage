@@ -142,7 +142,7 @@ def main():
     except ImportError:
         sys.exit("Module manquant : pip install confluent-kafka")
 
-    bootstrap = os.environ.get("KAFKA_BOOTSTRAP") or "localhost:29094"
+    bootstrap = os.environ.get("KAFKA_BOOTSTRAP") or "localhost:29092"
     lots = charger_lots(bootstrap)
     if not lots:
         sys.exit("Aucun lot dans le topic 'lots' : lance d'abord scripts/export_lots.py")
