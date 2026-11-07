@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 580" width="1320" height="580" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="1320" height="580" fill="#ffffff"/>
+  <text x="40" y="40" font-size="24" font-weight="600" fill="#222">Plateforme anti-gaspillage : avancement de la partie ERP (Odoo 18)</text>
+  <text x="40" y="64" font-size="14" fill="#666">Les exigences ERP1 à ERP16 du cahier des charges, regroupées par étape du cours</text>
+  <text x="40" y="102" font-size="16" font-weight="600" fill="#222">Étape 2 : paramétrage fonctionnel</text>
+  <text x="318" y="102" font-size="12" fill="#777">ce qui est configuré dans Odoo 18</text>
+  <rect x="40" y="114" width="165" height="100" rx="8" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2" />
+  <text x="50" y="136" font-size="14" font-weight="600" fill="#222">Modules</text>
+  <text x="195" y="136" text-anchor="end" font-size="11" fill="#444">ERP1</text>
+  <text x="50" y="160" font-size="11.5" fill="#444">Inventaire, Ventes, Dates</text>
+  <text x="50" y="177" font-size="11.5" fill="#444">d'expiration, Contacts,</text>
+  <text x="50" y="194" font-size="11.5" fill="#444">Facturation (via seed_odoo.py)</text>
+  <rect x="217" y="114" width="165" height="100" rx="8" fill="#fff4e0" stroke="#e08a00" stroke-width="2" />
+  <text x="227" y="136" font-size="14" font-weight="600" fill="#222">Données de base</text>
+  <text x="372" y="136" text-anchor="end" font-size="11" fill="#444">ERP2</text>
+  <text x="227" y="160" font-size="11.5" fill="#444">3 magasins, 30 produits,</text>
+  <text x="227" y="177" font-size="11.5" fill="#444">150 lots avec dates</text>
+  <text x="227" y="194" font-size="11.5" fill="#444">taxes pas encore gérées</text>
+  <rect x="394" y="114" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="404" y="136" font-size="14" font-weight="600" fill="#666">Droits et sécurité</text>
+  <text x="549" y="136" text-anchor="end" font-size="11" fill="#777">ERP3</text>
+  <text x="404" y="160" font-size="11.5" fill="#777">groupes responsable</text>
+  <text x="404" y="177" font-size="11.5" fill="#777">magasin, achats,</text>
+  <text x="404" y="194" font-size="11.5" fill="#777">comptable</text>
+  <rect x="571" y="114" width="165" height="100" rx="8" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2" />
+  <text x="581" y="136" font-size="14" font-weight="600" fill="#222">Vues et tableaux</text>
+  <text x="726" y="136" text-anchor="end" font-size="11" fill="#444">ERP4</text>
+  <text x="581" y="160" font-size="11.5" fill="#444">liste, pivot et graphique</text>
+  <text x="581" y="177" font-size="11.5" fill="#444">du risque d'invendu, par</text>
+  <text x="581" y="194" font-size="11.5" fill="#444">niveau de risque</text>
+  <text x="40" y="242" font-size="16" font-weight="600" fill="#222">Étape 2bis : module lot_waste_risk</text>
+  <text x="326" y="242" font-size="12" fill="#777">module installé sur Odoo 18 (essai réussi)</text>
+  <rect x="40" y="254" width="165" height="100" rx="8" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2" />
+  <text x="50" y="276" font-size="14" font-weight="600" fill="#222">Modèle stock.lot</text>
+  <text x="195" y="276" text-anchor="end" font-size="11" fill="#444">ERP5</text>
+  <text x="50" y="300" font-size="11.5" fill="#444">niveau de risque, taux</text>
+  <text x="50" y="317" font-size="11.5" fill="#444">d'invendus, remise</text>
+  <text x="50" y="334" font-size="11.5" fill="#444">date de mise à jour</text>
+  <rect x="217" y="254" width="165" height="100" rx="8" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2" />
+  <text x="227" y="276" font-size="14" font-weight="600" fill="#222">Vues sur mesure</text>
+  <text x="372" y="276" text-anchor="end" font-size="11" fill="#444">ERP5</text>
+  <text x="227" y="300" font-size="11.5" fill="#444">colonnes et onglet sur</text>
+  <text x="227" y="317" font-size="11.5" fill="#444">le lot, filtres « Lots</text>
+  <text x="227" y="334" font-size="11.5" fill="#444">à risque »</text>
+  <rect x="394" y="254" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="404" y="276" font-size="14" font-weight="600" fill="#666">Rapport QWeb</text>
+  <text x="549" y="276" text-anchor="end" font-size="11" fill="#777">ERP6</text>
+  <text x="404" y="300" font-size="11.5" fill="#777">bilan PDF des lots à</text>
+  <text x="404" y="317" font-size="11.5" fill="#777">risque du jour,</text>
+  <text x="404" y="334" font-size="11.5" fill="#777">par magasin</text>
+  <rect x="571" y="254" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="581" y="276" font-size="14" font-weight="600" fill="#666">Tâche planifiée</text>
+  <text x="726" y="276" text-anchor="end" font-size="11" fill="#777">ERP7</text>
+  <text x="581" y="300" font-size="11.5" fill="#777">activité « Appliquer</text>
+  <text x="581" y="317" font-size="11.5" fill="#777">la remise » pour chaque</text>
+  <text x="581" y="334" font-size="11.5" fill="#777">lot de niveau élevé</text>
+  <rect x="748" y="254" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="758" y="276" font-size="14" font-weight="600" fill="#666">Sécurité dédiée</text>
+  <text x="903" y="276" text-anchor="end" font-size="11" fill="#777">ERP8</text>
+  <text x="758" y="300" font-size="11.5" fill="#777">groupe anti-gaspillage,</text>
+  <text x="758" y="317" font-size="11.5" fill="#777">ACL et règles ir.rule</text>
+  <text x="758" y="334" font-size="11.5" fill="#777">par magasin</text>
+  <rect x="925" y="254" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="935" y="276" font-size="14" font-weight="600" fill="#666">Tests fonctionnels</text>
+  <text x="1080" y="276" text-anchor="end" font-size="11" fill="#777">ERP9</text>
+  <text x="935" y="300" font-size="11.5" fill="#777">3 magasins, 30 lots,</text>
+  <text x="935" y="317" font-size="11.5" fill="#777">flux de ventes,</text>
+  <text x="935" y="334" font-size="11.5" fill="#777">remises vérifiées</text>
+  <text x="40" y="382" font-size="16" font-weight="600" fill="#222">Étape 2ter : intégration et déploiement</text>
+  <text x="366" y="382" font-size="12" fill="#777">liaison avec la plateforme Big Data et exploitation</text>
+  <rect x="40" y="394" width="165" height="100" rx="8" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2" />
+  <text x="50" y="416" font-size="14" font-weight="600" fill="#222">API XML-RPC</text>
+  <text x="195" y="416" text-anchor="end" font-size="11" fill="#444">ERP10</text>
+  <text x="50" y="440" font-size="11.5" fill="#444">lecture : export_lots.py,</text>
+  <text x="50" y="457" font-size="11.5" fill="#444">écriture du risque :</text>
+  <text x="50" y="474" font-size="11.5" fill="#444">sync_risque_odoo.py</text>
+  <rect x="217" y="394" width="165" height="100" rx="8" fill="#fff4e0" stroke="#e08a00" stroke-width="2" />
+  <text x="227" y="416" font-size="14" font-weight="600" fill="#222">Import CSV</text>
+  <text x="372" y="416" text-anchor="end" font-size="11" fill="#444">ERP11</text>
+  <text x="227" y="440" font-size="11.5" fill="#444">CSV générés, import</text>
+  <text x="227" y="457" font-size="11.5" fill="#444">Odoo à documenter</text>
+  <text x="227" y="474" font-size="11.5" fill="#444">et à tester</text>
+  <rect x="394" y="394" width="165" height="100" rx="8" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2" />
+  <text x="404" y="416" font-size="14" font-weight="600" fill="#222">Docker</text>
+  <text x="549" y="416" text-anchor="end" font-size="11" fill="#444">ERP12</text>
+  <text x="404" y="440" font-size="11.5" fill="#444">Odoo 18 + PostgreSQL</text>
+  <text x="404" y="457" font-size="11.5" fill="#444">dans docker-compose,</text>
+  <text x="404" y="474" font-size="11.5" fill="#444">addons monté en volume</text>
+  <rect x="571" y="394" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="581" y="416" font-size="14" font-weight="600" fill="#666">Sauvegarde</text>
+  <text x="726" y="416" text-anchor="end" font-size="11" fill="#777">ERP13</text>
+  <text x="581" y="440" font-size="11.5" fill="#777">base + filestore,</text>
+  <text x="581" y="457" font-size="11.5" fill="#777">test de restauration</text>
+  <rect x="748" y="394" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="758" y="416" font-size="14" font-weight="600" fill="#666">Surveillance</text>
+  <text x="903" y="416" text-anchor="end" font-size="11" fill="#777">ERP14</text>
+  <text x="758" y="440" font-size="11.5" fill="#777">journaux Odoo et</text>
+  <text x="758" y="457" font-size="11.5" fill="#777">disponibilité</text>
+  <rect x="925" y="394" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="935" y="416" font-size="14" font-weight="600" fill="#666">Sécurisation</text>
+  <text x="1080" y="416" text-anchor="end" font-size="11" fill="#777">ERP15</text>
+  <text x="935" y="440" font-size="11.5" fill="#777">clé d'API dédiée,</text>
+  <text x="935" y="457" font-size="11.5" fill="#777">HTTPS derrière un</text>
+  <text x="935" y="474" font-size="11.5" fill="#777">reverse proxy</text>
+  <rect x="1102" y="394" width="165" height="100" rx="8" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="1112" y="416" font-size="14" font-weight="600" fill="#666">Rapprochement</text>
+  <text x="1257" y="416" text-anchor="end" font-size="11" fill="#777">ERP16</text>
+  <text x="1112" y="440" font-size="11.5" fill="#777">lots à risque et stock</text>
+  <text x="1112" y="457" font-size="11.5" fill="#777">identiques dans Odoo</text>
+  <text x="1112" y="474" font-size="11.5" fill="#777">et la plateforme</text>
+  <rect x="40" y="540" width="26" height="16" rx="3" fill="#e6f4ea" stroke="#2e7d32" stroke-width="2"/>
+  <text x="76" y="553" font-size="13" fill="#333">Fait</text>
+  <rect x="140" y="540" width="26" height="16" rx="3" fill="#fff4e0" stroke="#e08a00" stroke-width="2"/>
+  <text x="176" y="553" font-size="13" fill="#333">Partiel</text>
+  <rect x="260" y="540" width="26" height="16" rx="3" fill="#f5f5f5" stroke="#9e9e9e" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="296" y="553" font-size="13" fill="#333">À faire</text>
+</svg>

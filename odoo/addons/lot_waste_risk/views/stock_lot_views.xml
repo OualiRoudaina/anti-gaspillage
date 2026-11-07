@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Liste des lots : colonnes de risque + couleurs -->
+    <record id="view_lot_waste_risk_list_inherit" model="ir.ui.view">
+        <field name="name">stock.lot.list.waste.risk</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="decoration-danger">waste_risk_level == 'eleve'</attribute>
+                <attribute name="decoration-warning">waste_risk_level == 'a_surveiller'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="waste_risk_level" widget="badge"
+                       decoration-danger="waste_risk_level == 'eleve'"
+                       decoration-warning="waste_risk_level == 'a_surveiller'"
+                       decoration-success="waste_risk_level == 'faible'"
+                       optional="show"/>
+                <field name="waste_risk_rate" optional="show"/>
+                <field name="waste_discount" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Fiche du lot : onglet Risque d'invendu -->
+    <record id="view_lot_waste_risk_form_inherit" model="ir.ui.view">
+        <field name="name">stock.lot.form.waste.risk</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Risque d'invendu" name="waste_risk">
+                        <group>
+                            <group string="Résultat">
+                                <field name="waste_risk_level"/>
+                                <field name="waste_risk_rate"/>
+                                <field name="waste_projected_unsold"/>
+                                <field name="waste_discount"/>
+                            </group>
+                            <group string="Calcul">
+                                <field name="waste_sales_speed"/>
+                                <field name="waste_days_left"/>
+                                <field name="waste_risk_updated"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Recherche : filtres lots à risque -->
+    <record id="view_lot_waste_risk_search_inherit" model="ir.ui.view">
+        <field name="name">stock.lot.search.waste.risk</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="waste_high" string="Risque élevé"
+                        domain="[('waste_risk_level', '=', 'eleve')]"/>
+                <filter name="waste_watch" string="À surveiller"
+                        domain="[('waste_risk_level', '=', 'a_surveiller')]"/>
+                <filter name="waste_at_risk" string="Lots à risque"
+                        domain="[('waste_risk_level', 'in', ['eleve', 'a_surveiller'])]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_waste_level" string="Niveau de risque"
+                            context="{'group_by': 'waste_risk_level'}"/>
+                    <filter name="group_waste_product" string="Produit"
+                            context="{'group_by': 'product_id'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Pivot et graphique -->
+    <record id="view_lot_waste_risk_pivot" model="ir.ui.view">
+        <field name="name">stock.lot.pivot.waste.risk</field>
+        <field name="model">stock.lot</field>
+        <field name="arch" type="xml">
+            <pivot string="Risque d'invendu">
+                <field name="waste_risk_level" type="row"/>
+                <field name="product_id" type="col"/>
+                <field name="waste_projected_unsold" type="measure"/>
+                <field name="waste_risk_rate" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_lot_waste_risk_graph" model="ir.ui.view">
+        <field name="name">stock.lot.graph.waste.risk</field>
+        <field name="model">stock.lot</field>
+        <field name="arch" type="xml">
+            <graph string="Invendus projetés par niveau de risque" type="bar">
+                <field name="waste_risk_level"/>
+                <field name="waste_projected_unsold" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Menu : Inventaire > Rapports > Risque d'invendu -->
+    <record id="action_lot_waste_risk" model="ir.actions.act_window">
+        <field name="name">Risque d'invendu</field>
+        <field name="res_model">stock.lot</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="domain">[('waste_risk_level', '!=', False)]</field>
+        <field name="context">{'search_default_waste_at_risk': 1}</field>
+    </record>
+
+    <menuitem id="menu_lot_waste_risk"
+              name="Risque d'invendu"
+              parent="stock.menu_warehouse_report"
+              action="action_lot_waste_risk"
+              sequence="50"/>
+</odoo>
