@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tâche planifiée : une activité « Appliquer la remise » par lot à risque élevé -->
+    <record id="cron_apply_discount" model="ir.cron">
+        <field name="name">Appliquer la remise aux lots à risque élevé</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_apply_discount_activities()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Même action, à la demande, sur les lots sélectionnés dans la liste -->
+    <record id="action_server_apply_discount" model="ir.actions.server">
+        <field name="name">Appliquer la remise recommandée</field>
+        <field name="model_id" ref="stock.model_stock_lot"/>
+        <field name="binding_model_id" ref="stock.model_stock_lot"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <field name="code">records._create_discount_activities()</field>
+    </record>
+</odoo>

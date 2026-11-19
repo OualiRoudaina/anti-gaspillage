@@ -39,6 +39,7 @@ def construire_valeurs(risque):
         return None
     try:
         return {
+            "waste_store": risque.get("magasin", ""),
             "waste_risk_level": niveau,
             "waste_risk_rate": float(risque.get("taux_invendus", 0)),
             "waste_projected_unsold": float(risque.get("invendus_projetes", 0)),

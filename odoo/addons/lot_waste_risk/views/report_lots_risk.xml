@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Rapport PDF : lots à risque d'invendu, groupés par magasin -->
+    <record id="action_report_lots_risk" model="ir.actions.report">
+        <field name="name">Lots à risque d'invendu</field>
+        <field name="model">stock.lot</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">lot_waste_risk.report_lots_risk</field>
+        <field name="report_file">lot_waste_risk.report_lots_risk</field>
+        <field name="binding_model_id" ref="stock.model_stock_lot"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_lots_risk">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2>Lots à risque d'invendu</h2>
+                    <p>
+                        Édité le <span t-out="date_edition"/> ·
+                        <strong t-out="total"/> lot(s) concerné(s).
+                    </p>
+
+                    <t t-if="not magasins">
+                        <p>Aucun lot à risque.</p>
+                    </t>
+
+                    <t t-foreach="magasins" t-as="magasin">
+                        <h4 class="mt-4">
+                            Magasin <span t-out="magasin['nom']"/>
+                            <small class="text-muted">
+                                : <span t-out="magasin['nb_eleve']"/> à risque élevé,
+                                <span t-out="magasin['nb_surveiller']"/> à surveiller
+                            </small>
+                        </h4>
+                        <table class="table table-sm o_main_table">
+                            <thead>
+                                <tr>
+                                    <th>Lot</th>
+                                    <th>Produit</th>
+                                    <th>Niveau</th>
+                                    <th class="text-end">Taux d'invendus</th>
+                                    <th class="text-end">Invendus projetés</th>
+                                    <th class="text-end">Jours restants</th>
+                                    <th class="text-end">Remise</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="magasin['lignes']" t-as="l"
+                                    t-attf-class="#{'table-danger' if l['niveau'] == 'eleve' else 'table-warning' if l['niveau'] == 'a_surveiller' else ''}">
+                                    <td><span t-out="l['lot']"/></td>
+                                    <td><span t-out="l['produit']"/></td>
+                                    <td><span t-out="l['niveau_label']"/></td>
+                                    <td class="text-end"><span t-out="'%.0f %%' % l['taux']"/></td>
+                                    <td class="text-end"><span t-out="'%.0f' % l['invendus']"/></td>
+                                    <td class="text-end"><span t-out="'%.1f' % l['jours']"/></td>
+                                    <td class="text-end"><span t-out="'%d %%' % l['remise'] if l['remise'] else '-'"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Menu : Inventaire > Rapports > Rapport PDF des lots à risque -->
+    <record id="action_report_lots_risk_url" model="ir.actions.act_url">
+        <field name="name">Rapport PDF des lots à risque</field>
+        <field name="url">/report/pdf/lot_waste_risk.report_lots_risk</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_report_lots_risk"
+              name="Rapport PDF des lots à risque"
+              parent="stock.menu_warehouse_report"
+              action="action_report_lots_risk_url"
+              sequence="51"/>
+</odoo>

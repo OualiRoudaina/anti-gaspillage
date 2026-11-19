@@ -9,7 +9,11 @@ recommandée. Les valeurs sont écrites par le script scripts/sync_risque_odoo.p
     """,
     "category": "Inventory",
     "depends": ["stock", "product_expiry"],
-    "data": ["views/stock_lot_views.xml"],
+    "data": [
+        "views/stock_lot_views.xml",
+        "views/report_lots_risk.xml",
+        "views/cron_remise.xml",
+    ],
     "license": "LGPL-3",
     "installable": True,
     "application": False,

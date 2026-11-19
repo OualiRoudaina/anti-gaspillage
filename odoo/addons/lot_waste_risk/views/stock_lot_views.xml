@@ -11,6 +11,7 @@
                 <attribute name="decoration-warning">waste_risk_level == 'a_surveiller'</attribute>
             </xpath>
             <xpath expr="//field[@name='name']" position="after">
+                <field name="waste_store" optional="show"/>
                 <field name="waste_risk_level" widget="badge"
                        decoration-danger="waste_risk_level == 'eleve'"
                        decoration-warning="waste_risk_level == 'a_surveiller'"
@@ -33,6 +34,7 @@
                     <page string="Risque d'invendu" name="waste_risk">
                         <group>
                             <group string="Résultat">
+                                <field name="waste_store"/>
                                 <field name="waste_risk_level"/>
                                 <field name="waste_risk_rate"/>
                                 <field name="waste_projected_unsold"/>
@@ -65,6 +67,8 @@
                 <filter name="waste_at_risk" string="Lots à risque"
                         domain="[('waste_risk_level', 'in', ['eleve', 'a_surveiller'])]"/>
                 <group expand="0" string="Regrouper par">
+                    <filter name="group_waste_store" string="Magasin"
+                            context="{'group_by': 'waste_store'}"/>
                     <filter name="group_waste_level" string="Niveau de risque"
                             context="{'group_by': 'waste_risk_level'}"/>
                     <filter name="group_waste_product" string="Produit"
