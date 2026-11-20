@@ -32,6 +32,21 @@ TOPIC_LOTS = "lots"
 TOPIC_VENTES = "ventes"
 
 
+def port_kafka_externe():
+    """Port Kafka exposé sur le PC : KAFKA_EXTERNAL_PORT du fichier .env, sinon 29092."""
+    env = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+    try:
+        with open(env, encoding="utf-8") as f:
+            for ligne in f:
+                if ligne.strip().startswith("KAFKA_EXTERNAL_PORT="):
+                    valeur = ligne.split("=", 1)[1].strip()
+                    if valeur:
+                        return valeur
+    except OSError:
+        pass
+    return "29092"
+
+
 def charger_lots(bootstrap, delai_max=30):
     """Lit tout le topic `lots` et garde le dernier état de chaque lot."""
     from confluent_kafka import Consumer, KafkaError
@@ -142,7 +157,7 @@ def main():
     except ImportError:
         sys.exit("Module manquant : pip install confluent-kafka")
 
-    bootstrap = os.environ.get("KAFKA_BOOTSTRAP") or "localhost:29092"
+    bootstrap = os.environ.get("KAFKA_BOOTSTRAP") or f"localhost:{port_kafka_externe()}"
     lots = charger_lots(bootstrap)
     if not lots:
         sys.exit("Aucun lot dans le topic 'lots' : lance d'abord scripts/export_lots.py")
