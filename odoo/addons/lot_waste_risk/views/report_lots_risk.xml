@@ -51,10 +51,10 @@
                                     <td><span t-out="l['lot']"/></td>
                                     <td><span t-out="l['produit']"/></td>
                                     <td><span t-out="l['niveau_label']"/></td>
-                                    <td class="text-end"><span t-out="'%.0f %%' % l['taux']"/></td>
-                                    <td class="text-end"><span t-out="'%.0f' % l['invendus']"/></td>
-                                    <td class="text-end"><span t-out="'%.1f' % l['jours']"/></td>
-                                    <td class="text-end"><span t-out="'%d %%' % l['remise'] if l['remise'] else '-'"/></td>
+                                    <td class="text-end"><span t-out="'{:.0f} %'.format(l['taux'])"/></td>
+                                    <td class="text-end"><span t-out="'{:.0f}'.format(l['invendus'])"/></td>
+                                    <td class="text-end"><span t-out="'{:.1f}'.format(l['jours'])"/></td>
+                                    <td class="text-end"><span t-out="'{} %'.format(l['remise']) if l['remise'] else '-'"/></td>
                                 </tr>
                             </tbody>
                         </table>
