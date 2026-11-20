@@ -49,17 +49,63 @@ def jours_restants(date_limite, maintenant):
         return None
 
 
-def obtenir_vitesse_vente(client, lot_id):
-    donnees = client.hgetall(f"vitesse:{lot_id}")
+def cle_vitesse_produit_magasin(magasin, produit_ref):
+    return f"vitesse_pm:{magasin}:{produit_ref}"
 
+
+def _vitesse_positive(donnees):
     try:
         vitesse = float(donnees.get("vitesse_moyenne_jour", 0))
-        if vitesse > 0:
-            return vitesse
     except (TypeError, ValueError):
-        pass
+        return None
+    return vitesse if vitesse > 0 else None
 
-    return VITESSE_DEFAUT
+
+def ecrire_vitesses_produit_magasin(client, lignes):
+    """Écrit dans Redis la vitesse moyenne par produit et par magasin.
+
+    `lignes` : éléments avec produit_ref, magasin, vitesse_moyenne_jour,
+    quantite_vendue et jours_actifs. Retourne le nombre de lignes écrites.
+    """
+    ecrites = 0
+    for ligne in lignes:
+        if not ligne["produit_ref"] or not ligne["magasin"]:
+            continue
+        client.hset(
+            cle_vitesse_produit_magasin(ligne["magasin"], ligne["produit_ref"]),
+            mapping={
+                "vitesse_moyenne_jour": str(
+                    round(float(ligne["vitesse_moyenne_jour"]), 2)
+                ),
+                "quantite_vendue": str(ligne["quantite_vendue"]),
+                "jours_actifs": str(ligne["jours_actifs"]),
+                "date_calcul": datetime.now(timezone.utc).isoformat()
+            }
+        )
+        ecrites += 1
+    return ecrites
+
+
+def obtenir_vitesse_detail(client, lot_id, lot=None):
+    """Retourne (vitesse, source) : lot, puis produit et magasin, puis défaut."""
+    vitesse = _vitesse_positive(client.hgetall(f"vitesse:{lot_id}"))
+    if vitesse is not None:
+        return vitesse, "batch"
+
+    if lot and lot.get("produit_ref") and lot.get("magasin"):
+        vitesse = _vitesse_positive(
+            client.hgetall(
+                cle_vitesse_produit_magasin(lot["magasin"], lot["produit_ref"])
+            )
+        )
+        if vitesse is not None:
+            return vitesse, "batch_produit"
+
+    return VITESSE_DEFAUT, "defaut"
+
+
+def obtenir_vitesse_vente(client, lot_id, lot=None):
+    return obtenir_vitesse_detail(client, lot_id, lot)[0]
 
 
 def calculer_risque(stock, jours, vitesse):
@@ -117,7 +163,7 @@ def traiter_lot(client, lot_id, maintenant, dry_run=False, afficher=True):
     if not lot:
         return False
 
-    vitesse = obtenir_vitesse_vente(client, lot_id)
+    vitesse, source_vitesse = obtenir_vitesse_detail(client, lot_id, lot)
     resultat = analyser_lot(lot, maintenant, vitesse)
 
     if resultat is None:
@@ -150,11 +196,7 @@ def traiter_lot(client, lot_id, maintenant, dry_run=False, afficher=True):
         mapping={
             "jours_restants": resultat["jours_restants"],
             "vitesse": resultat["vitesse_vente"],
-            "vitesse_source": (
-                "batch"
-                if client.hexists(f"vitesse:{lot_id}", "vitesse_moyenne_jour")
-                else "defaut"
-            ),
+            "vitesse_source": source_vitesse,
             "invendus_projetes": resultat["invendus_projetes"],
             "taux_invendus": resultat["taux_invendus"],
             "niveau": resultat["niveau_risque"],

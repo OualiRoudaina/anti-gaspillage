@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 import redis
 
+from risque import ecrire_vitesses_produit_magasin
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col,
@@ -12,6 +13,7 @@ from pyspark.sql.functions import (
     to_timestamp,
     to_date,
     sum as spark_sum,
+    avg as spark_avg,
     countDistinct,
     first,
     current_timestamp
@@ -22,6 +24,11 @@ from pyspark.sql.types import (
     StringType,
     IntegerType
 )
+
+
+CHEMIN_VENTES = "/data/parquet/ventes"
+CHEMIN_QUOTIDIEN = "/data/parquet/ventes_par_jour"
+CHEMIN_PRODUIT_MAGASIN = "/data/parquet/vitesses_produit_magasin"
 
 
 def main():
@@ -121,6 +128,46 @@ def main():
             )
         )
 
+        # Les ventes nettoyées servent à plusieurs calculs : on les garde en mémoire
+        ventes.cache()
+
+        # Archive des ventes brutes (sans doublon), découpée par jour et par magasin
+        (
+            ventes
+            .write
+            .mode("overwrite")
+            .partitionBy("date_vente", "magasin")
+            .parquet(CHEMIN_VENTES)
+        )
+        print(f"Archive des ventes enregistrée : {CHEMIN_VENTES}")
+
+        # Ventes par produit, magasin et jour, puis vitesse moyenne par jour
+        quotidien = (
+            ventes
+            .groupBy("produit_ref", "magasin", "date_vente")
+            .agg(spark_sum("quantite").alias("quantite_jour"))
+        )
+
+        vitesses_pm = (
+            quotidien
+            .groupBy("produit_ref", "magasin")
+            .agg(
+                spark_avg("quantite_jour").alias("vitesse_moyenne_jour"),
+                spark_sum("quantite_jour").alias("quantite_vendue"),
+                countDistinct("date_vente").alias("jours_actifs")
+            )
+            .withColumn("date_calcul", current_timestamp())
+        )
+
+        quotidien.write.mode("overwrite").parquet(CHEMIN_QUOTIDIEN)
+        vitesses_pm.write.mode("overwrite").parquet(CHEMIN_PRODUIT_MAGASIN)
+        print(
+            "Archives enregistrées : "
+            f"{CHEMIN_QUOTIDIEN}, {CHEMIN_PRODUIT_MAGASIN}"
+        )
+
+        resultats_pm = vitesses_pm.collect()
+
         nombre_lots = vitesses.count()
 
         print(f"{nombre_lots} lots avec des ventes analysés.")
@@ -182,6 +229,12 @@ def main():
 
             print(
                 f"{len(resultats)} vitesses enregistrées dans Redis."
+            )
+
+            ecrites = ecrire_vitesses_produit_magasin(client, resultats_pm)
+            print(
+                f"{ecrites} vitesses par produit et magasin "
+                "enregistrées dans Redis."
             )
 
         print("\nAperçu des 10 premiers résultats :")
